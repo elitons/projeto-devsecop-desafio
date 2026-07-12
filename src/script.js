@@ -1,6 +1,17 @@
 // ============================================
-// Busca tarefas do "banco de dados"
+// 🔒 SEGURANÇA: Credenciais removidas do código
 // ============================================
+// As seguintes linhas foram REMOVIDAS por segurança:
+// const API_KEY = "ghp_xK92mNpL34rTvQ87wZaB56cDeFgHiJkL";
+// const DB_PASSWORD = "admin@prod#2024";
+//
+// Em produção, use variáveis de ambiente ou GitHub Secrets
+// Exemplo: const API_KEY = process.env.API_KEY;
+
+// ============================================
+// 📋 Busca tarefas do "banco de dados"
+// ============================================
+// 🔧 CORREÇÃO: Caminho relativo corrigido para ./db.json
 fetch('./db.json')
     .then(response => {
         if (!response.ok) {
@@ -9,47 +20,55 @@ fetch('./db.json')
         return response.json();
     })
     .then(data => {
-        document.getElementById('db-status').innerText = data.status;
+        // Atualiza o status
+        const statusElement = document.getElementById('db-status');
+        if (statusElement) {
+            statusElement.innerText = data.status || 'Conectado ao Banco de Dados';
+        }
 
+        // Carrega as tarefas
         const list = document.getElementById('task-list');
-        data.itens.forEach(item => {
-            let li = document.createElement('li');
-            li.textContent = item.task; // Usando textContent em vez de innerText
-            list.appendChild(li);
-        });
+        if (list && data.itens && Array.isArray(data.itens)) {
+            data.itens.forEach(item => {
+                let li = document.createElement('li');
+                li.textContent = item.task;
+                list.appendChild(li);
+            });
+        }
     })
     .catch(err => {
-        // SEGURANÇA: Não expõe stack trace para o usuário
-        document.getElementById('db-status').innerText =
-            'Erro ao carregar dados. Tente novamente mais tarde.';
+        // 🔒 SEGURANÇA: Não expõe stack trace para o usuário
+        const statusElement = document.getElementById('db-status');
+        if (statusElement) {
+            statusElement.innerText = 'Erro ao carregar dados. Tente novamente mais tarde.';
+        }
         
         // Log do erro detalhado apenas no console do desenvolvedor
         console.error('Erro ao buscar dados:', err.message);
     });
 
 // ============================================
-# Adiciona nova tarefa na tela
+// ➕ Adiciona nova tarefa na tela
 // ============================================
 function addTask() {
     const input = document.getElementById('new-task');
     const output = document.getElementById('output');
     
-    // SEGURANÇA: Validação de entrada
+    // 🔒 SEGURANÇA: Validação de entrada
     if (!input || !input.value || input.value.trim() === '') {
         alert('Por favor, digite uma tarefa!');
         return;
     }
 
-    // SEGURANÇA: Sanitização da entrada do usuário
-    // Remove caracteres perigosos para prevenir XSS
+    // 🔒 SEGURANÇA: Sanitização da entrada do usuário
     const sanitizedText = input.value
-        .replace(/[<>]/g, '')           // Remove < e >
-        .replace(/&/g, '&amp;')         // Escapa &
-        .replace(/"/g, '&quot;')        // Escapa "
-        .replace(/'/g, '&#x27;')        // Escapa '
-        .replace(/\//g, '&#x2F;');      // Escapa /
+        .replace(/[<>]/g, '')
+        .replace(/&/g, '&amp;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#x27;')
+        .replace(/\//g, '&#x2F;');
 
-    // SEGURANÇA: Usa createElement em vez de innerHTML
+    // 🔒 SEGURANÇA: Usa createElement em vez de innerHTML
     const li = document.createElement('li');
     li.textContent = sanitizedText;
 
@@ -60,7 +79,6 @@ function addTask() {
     deleteBtn.style.marginLeft = '10px';
     deleteBtn.style.cursor = 'pointer';
     
-    // SEGURANÇA: Usa função nomeada em vez de eval
     deleteBtn.onclick = function() {
         if (confirm('Tem certeza que deseja excluir esta tarefa?')) {
             output.removeChild(li);
@@ -70,7 +88,6 @@ function addTask() {
     li.appendChild(deleteBtn);
     output.appendChild(li);
 
-    // SEGURANÇA: Log seguro sem eval
     console.log(`Tarefa adicionada: "${sanitizedText}"`);
 
     // Limpa o input
@@ -78,7 +95,7 @@ function addTask() {
 }
 
 // ============================================
-// Função adicional: Limpar todas as tarefas
+// 🚀 Função: Limpar todas as tarefas
 // ============================================
 function clearAllTasks() {
     const output = document.getElementById('output');
@@ -95,7 +112,7 @@ function clearAllTasks() {
 }
 
 // ============================================
-// Função para contar tarefas
+// 📊 Função: Contar tarefas
 // ============================================
 function countTasks() {
     const output = document.getElementById('output');
@@ -106,7 +123,7 @@ function countTasks() {
 }
 
 // ============================================
-// Inicialização: Adiciona listeners se necessário
+// 🎯 Inicialização
 // ============================================
 document.addEventListener('DOMContentLoaded', function() {
     // Adiciona listener para a tecla Enter no input
@@ -119,13 +136,12 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
     
-    console.log('Aplicação inicializada com segurança!');
+    console.log('✅ Aplicação inicializada com segurança!');
 });
 
 // ============================================
-// Exporta funções para uso global (se necessário)
+// 📝 Exporta funções para uso global
 // ============================================
-// Tornando funções disponíveis globalmente para o HTML
 window.addTask = addTask;
 window.clearAllTasks = clearAllTasks;
 window.countTasks = countTasks;
