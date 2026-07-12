@@ -1,7 +1,7 @@
 // ============================================
 // Busca tarefas do "banco de dados"
 // ============================================
-fetch('db.json')
+fetch('./db.json')
     .then(response => {
         if (!response.ok) {
             throw new Error(`HTTP error! status: ${response.status}`);
