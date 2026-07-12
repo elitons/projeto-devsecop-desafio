@@ -1,0 +1,16 @@
+title = "Gitleaks Config"
+
+[extend]
+useDefault = true
+
+[[rules]]
+id = "hardcoded-api-key"
+description = "Hardcoded API Key"
+regex = '''sk_live_[a-zA-Z0-9]+'''
+tags = ["key", "api"]
+
+[[rules]]
+id = "hardcoded-secret"
+description = "Hardcoded Secret"
+regex = '''SECRET_KEY\s*=\s*"([^"]+)"'''
+tags = ["key", "secret"]
