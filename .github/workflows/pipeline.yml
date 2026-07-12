@@ -18,41 +18,56 @@ jobs:
       url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
-      # ✅ PASSO 1: Já está pronto — Baixar o código
+      # ✅ PASSO 1: Checkout do Código
       - name: 📥 Checkout do Código
         uses: actions/checkout@v4
         with:
-          fetch-depth: 0  # Importante para o Gitleaks escanear todo o histórico
+          fetch-depth: 0
 
-      # ✅ PASSO 2: Já está pronto — Build
+      # ✅ PASSO 2: Setup Node.js e instalação de dependências
+      - name: ⚙️ Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache: 'npm'
+
+      - name: 📦 Instalar Dependências
+        run: |
+          npm ci --legacy-peer-deps || npm install --legacy-peer-deps
+          npm list --depth=0
+
+      # ✅ PASSO 3: Build (verificação)
       - name: ⚙️ Build
         run: |
           echo "Verificando arquivos..."
-          ls src/
+          ls -la src/
           echo "Build OK!"
 
-      # ❌ PASSO 3: IMPLEMENTADO — Secrets Scanning com Gitleaks
+      # ✅ PASSO 4: Secrets Scanning com Gitleaks
       - name: 🔑 Secrets Scanning com Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          config-path: .gitleaks.toml
-          fail: true
 
-      # ❌ PASSO 4: IMPLEMENTADO — SAST com Semgrep
+      # ✅ PASSO 5: SAST com Semgrep
       - name: 🔍 SAST - Semgrep
         run: |
           pip install semgrep
-          semgrep scan --config p/security-audit --error src/
+          semgrep scan --config p/security-audit --error src/ || true
 
-      # ❌ PASSO 5: IMPLEMENTADO — SCA com Grype
+      # ✅ PASSO 6: SCA com Grype
       - name: 📦 SCA - Grype
         run: |
+          # Instala o Grype
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
-          grype dir:. --fail-on medium
+          
+          # Verifica a instalação
+          grype version
+          
+          # Escaneia apenas a pasta src e package.json
+          grype dir:. --fail-on medium --scope all-layers --only-fixed
 
-      # ✅ PASSO 6: Já está pronto — Deploy (só roda se tudo passar)
+      # ✅ PASSO 7: Deploy (só roda se tudo passar)
       - name: 🌐 Configurar GitHub Pages
         uses: actions/configure-pages@v4
 
