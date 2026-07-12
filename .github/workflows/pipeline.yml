@@ -3,6 +3,7 @@ name: 🔐 Pipeline DevSecOps
 on:
   push:
     branches: [ "main" ]
+  workflow_dispatch:  # Permite executar manualmente
 
 permissions:
   contents: read
@@ -10,13 +11,10 @@ permissions:
   id-token: write
 
 jobs:
-  pipeline:
-    name: Build, Segurança e Deploy
+  security-checks:
+    name: 🔒 Security Checks
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
+    
     steps:
       # ✅ PASSO 1: Checkout do Código
       - name: 📥 Checkout do Código
@@ -24,58 +22,69 @@ jobs:
         with:
           fetch-depth: 0
 
-      # ✅ PASSO 2: Setup Node.js e instalação de dependências
+      # ✅ PASSO 2: Setup Node.js
       - name: ⚙️ Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '18'
           cache: 'npm'
 
+      # ✅ PASSO 3: Instalar Dependências
       - name: 📦 Instalar Dependências
         run: |
           npm ci --legacy-peer-deps || npm install --legacy-peer-deps
           npm list --depth=0
 
-      # ✅ PASSO 3: Build (verificação)
+      # ✅ PASSO 4: Build
       - name: ⚙️ Build
         run: |
           echo "Verificando arquivos..."
           ls -la src/
           echo "Build OK!"
 
-      # ✅ PASSO 4: Secrets Scanning com Gitleaks
+      # ✅ PASSO 5: Secrets Scanning com Gitleaks
       - name: 🔑 Secrets Scanning com Gitleaks
         uses: gitleaks/gitleaks-action@v2
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
-      # ✅ PASSO 5: SAST com Semgrep
+      # ✅ PASSO 6: SAST com Semgrep
       - name: 🔍 SAST - Semgrep
         run: |
           pip install semgrep
           semgrep scan --config p/security-audit --error src/ || true
 
-      # ✅ PASSO 6: SCA com Grype
+      # ✅ PASSO 7: SCA com Grype
       - name: 📦 SCA - Grype
         run: |
-          # Instala o Grype
           curl -sSfL https://raw.githubusercontent.com/anchore/grype/main/install.sh | sh -s -- -b /usr/local/bin
-          
-          # Verifica a instalação
           grype version
-          
-          # Escaneia apenas a pasta src e package.json
           grype dir:. --fail-on medium --scope all-layers --only-fixed
 
-      # ✅ PASSO 7: Deploy (só roda se tudo passar)
+  deploy:
+    name: 🚀 Deploy
+    runs-on: ubuntu-latest
+    needs: security-checks  # Só roda se os checks de segurança passarem
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    
+    steps:
+      # ✅ PASSO 8: Checkout do Código
+      - name: 📥 Checkout do Código
+        uses: actions/checkout@v4
+
+      # ✅ PASSO 9: Configurar GitHub Pages
       - name: 🌐 Configurar GitHub Pages
         uses: actions/configure-pages@v4
 
+      # ✅ PASSO 10: Upload para Produção
       - name: 📤 Upload para Produção
         uses: actions/upload-pages-artifact@v3
         with:
           path: './src'
 
+      # ✅ PASSO 11: Deploy
       - name: 🚀 Deploy em Produção
         id: deployment
         uses: actions/deploy-pages@v4
