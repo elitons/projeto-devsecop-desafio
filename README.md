@@ -98,7 +98,7 @@ A pipeline é executada automaticamente a cada `push` na branch `main` e segue o
 **Problema:**
 ```javascript
 const API_KEY = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Token exemplo para não ter erros de pipeline
-const DB_PASSWORD = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Senha exemplo para não ter erros de pipeline
+const DB_PASSWORD = "********"; // Senha exemplo para não ter erros de pipeline
 
 ## 2. 🔴 CRÍTICO - Senha de Banco de Dados Hardcoded
 

@@ -3,6 +3,12 @@ title = "Gitleaks Config"
 [extend]
 useDefault = true
 
+# Ignorar arquivos de documentação
+[paths]
+  [[paths.ignore]]
+    path = '''README\.md'''
+    reason = "Arquivo de documentação com exemplos"
+
 [[rules]]
 id = "hardcoded-api-key"
 description = "Hardcoded API Key"
