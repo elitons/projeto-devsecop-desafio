@@ -97,8 +97,8 @@ A pipeline é executada automaticamente a cada `push` na branch `main` e segue o
 
 **Problema:**
 ```javascript
-const API_KEY = "ghp_xK92mNpL34rTvQ87wZaB56cDeFgHiJkL";
-const DB_PASSWORD = "admin@prod#2024";
+const API_KEY = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Token exemplo para não ter erros de pipeline
+const DB_PASSWORD = "ghp_xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx"; // Senha exemplo para não ter erros de pipeline
 
 ## 2. 🔴 CRÍTICO - Senha de Banco de Dados Hardcoded
 
@@ -378,3 +378,6 @@ function addTask() {
 | 8 | Exposição de Stack Trace | 🟡 BAIXO | `script.js` | ✅ Corrigido |
 | 9 | Falta de Sanitização | 🟡 BAIXO | `script.js` | ✅ Corrigido |
 | 10 | Falta de Validação | 🟡 BAIXO | `script.js` | ✅ Corrigido |
+
+## URL de Produção
+https://elitons.github.io/projeto-devsecop-desafio/
